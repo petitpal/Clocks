@@ -2,50 +2,57 @@
 
 namespace Clocks.Classes
 {
-    public struct DecimalTime
+    public struct DecimalTime : ITime<int>
     {
-        public const int HoursPerDay = 10;
-        public const int MinutesPerHour = 100;
-        public const int SecondsPerMinute = 100;
-        public const int MillisecondsPerSecond = 1000;
+        public int HoursPerDay => 10;
+        public int MinutesPerHour => 100;
+        public int SecondsPerMinute => 100;
+        public int MillisecondsPerSecond => 1000;
 
-        // private const int DecMsPerDay = 100000000;
-        // private const int UtcMsPerDay = 86400000;
 
-        private const int MsPerHour = 10000000;
-        private const int MsPerMinute = 100000;
-        private const int MsPerSecond = 1000;
+        public int Hours { get; private set; }
+        public int Minutes { get; private set; }
+        public int Seconds { get; private set; }
+        public int Milliseconds { get; private set; }
 
-        public int Hours { get; set; }
-        public int Minutes { get; set; }
-        public int Seconds { get; set; }
-        public int Milliseconds { get; set; }
 
-        public DecimalTime(int hours, int minutes, int seconds, int milliseconds)
+        public DecimalTime(int decHours,
+                           int decMinutes,
+                           int decSeconds,
+                           int decMilliseconds)
         {
-            Hours = hours;
-            Minutes = minutes;
-            Seconds = seconds;
-            Milliseconds = milliseconds;
+            Hours = decHours;
+            Minutes = decMinutes;
+            Seconds = decSeconds;
+            Milliseconds = decMilliseconds;
         }
 
-        public DecimalTime Empty() =>
+        public ITime<int> Empty() =>
             default;
 
-        public bool Equals(DecimalTime dc1, DecimalTime dc2) =>
+        public bool Equals(ITime<int> dc1, ITime<int> dc2) =>
             dc1.Hours == dc2.Hours
             && dc1.Minutes == dc2.Minutes
             && dc1.Seconds == dc2.Seconds
             && dc1.Milliseconds == dc2.Milliseconds;
 
-        public DecimalTime Now() =>
-            FromUtc(DateTime.Now.Hour, DateTime.Now.Minute, DateTime.Now.Second, DateTime.Now.Millisecond);
+        public ITime<int> Now() =>
+            new DecimalTime().PopulateFromUtc(DateTime.Now.TimeOfDay);
 
-        public static DecimalTime FromUtc(int hours, int minutes, int seconds, int milliseconds)
+        public ITime<int> PopulateFromUtc(int utcHours,
+                                          int utcMinutes,
+                                          int utcSeconds,
+                                          int utcMilliseconds) =>
+            PopulateFromUtc(new TimeSpan(0, utcHours, utcMinutes, utcSeconds, utcMilliseconds));
+
+        public ITime<int> PopulateFromUtc(TimeSpan utcTime)
         {
             const double UtcMsToDecimalMs = 0.864;
+            const int MsPerHour = 10000000;
+            const int MsPerMinute = 100000;
+            const int MsPerSecond = 1000;
 
-            var utcTotalMs = new TimeSpan(0, hours, minutes, seconds, milliseconds).TotalMilliseconds;
+            var utcTotalMs = utcTime.TotalMilliseconds;
             var decTotalMs = utcTotalMs / UtcMsToDecimalMs;
 
             return new DecimalTime()
@@ -63,27 +70,5 @@ namespace Clocks.Classes
             totalMs -= (t * msPerUnit);
             return t;
         }
-
-
-        //var utcHour = (int)(decTotalMs / MsPerHour);
-        //decTotalMs -= (utcHour * MsPerHour);
-
-        //var utcMinute = (int)(decTotalMs / MsPerMinute);
-        //decTotalMs -= (utcMinute * MsPerMinute);
-
-        //var utcSecond = (int)(decTotalMs / MsPerSecond);
-        //decTotalMs -= (utcSecond * MsPerSecond);
-
-        //var utcMs = (int)decTotalMs;
-
-        //public static TimeSpan ToUtc(utcTime dc)
-        //{
-
-        //}
-
-        //public TimeSpan ToUtc()
-        //{
-        //    return ToUtc(this);
-        //}
     }
 }

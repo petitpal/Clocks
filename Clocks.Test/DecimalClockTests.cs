@@ -20,7 +20,7 @@ namespace ClocksTest
             // arrange
 
             // act
-            var dt = DecimalTime.FromUtc(utcHours, utcMinutes, utcSeconds, utcMs);
+            var dt = new DecimalTime().PopulateFromUtc(utcHours, utcMinutes, utcSeconds, utcMs);
             
             // assert
             Assert.AreEqual(dt.Hours, decHours);

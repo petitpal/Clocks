@@ -36,7 +36,7 @@ namespace Clocks.Classes
             && dc1.Seconds == dc2.Seconds
             && dc1.Milliseconds == dc2.Milliseconds;
 
-        public ITime<int> Now() =>
+        public ITime<int> SetToNow() =>
             new DecimalTime().PopulateFromUtc(DateTime.Now.TimeOfDay);
 
         public ITime<int> PopulateFromUtc(int utcHours,
@@ -55,13 +55,11 @@ namespace Clocks.Classes
             var utcTotalMs = utcTime.TotalMilliseconds;
             var decTotalMs = utcTotalMs / UtcMsToDecimalMs;
 
-            return new DecimalTime()
-            {
-                Hours = ExtractUnitByMs(ref decTotalMs, MsPerHour),
-                Minutes = ExtractUnitByMs(ref decTotalMs, MsPerMinute),
-                Seconds = ExtractUnitByMs(ref decTotalMs, MsPerSecond),
-                Milliseconds = (int)decTotalMs
-            };
+            this.Hours = ExtractUnitByMs(ref decTotalMs, MsPerHour);
+            this.Minutes = ExtractUnitByMs(ref decTotalMs, MsPerMinute);
+            this.Seconds = ExtractUnitByMs(ref decTotalMs, MsPerSecond);
+            this.Milliseconds = (int)decTotalMs;
+            return this;
         }
 
         private static int ExtractUnitByMs(ref double totalMs, int msPerUnit)

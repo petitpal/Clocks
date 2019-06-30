@@ -16,8 +16,8 @@ namespace Clocks.Classes
 
         ITime<timeUnitType> PopulateFromUtc(int utcHours, int utcMinutes, int utcSeconds, int utcMilliseconds);
         ITime<timeUnitType> PopulateFromUtc(TimeSpan utcTime);
-        ITime<timeUnitType> Empty();
-        ITime<timeUnitType> Now();
+        
+        ITime<timeUnitType> SetToNow();
         bool Equals(ITime<timeUnitType> dc1, ITime<timeUnitType> dc2);
     }
 }

@@ -11,7 +11,7 @@ namespace Clocks
 
             ITime<int> time = new DecimalTime();
             
-            for (int i=0; i<100000;i++)
+            while (true)
             {
                 var now = DateTime.Now.TimeOfDay;
                 time.PopulateFromUtc(now);

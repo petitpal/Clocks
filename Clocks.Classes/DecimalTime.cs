@@ -47,7 +47,7 @@ namespace Clocks.Classes
 
         public ITime<int> PopulateFromUtc(TimeSpan utcTime)
         {
-            const double UtcMsToDecimalMs = 0.864;
+            const double UtcMsToDecimalMs = 0.864;  // UTC MS in a day / Dec MS in a day
             const int MsPerHour = 10000000;
             const int MsPerMinute = 100000;
             const int MsPerSecond = 1000;

@@ -2,22 +2,17 @@
 
 namespace Clocks.Classes
 {
-    public interface ITime<timeUnitType>
+    public interface ITime
     {
-        timeUnitType HoursPerDay { get; }
-        timeUnitType MinutesPerHour { get; }
-        timeUnitType SecondsPerMinute { get; }
-        timeUnitType MillisecondsPerSecond { get; }
+        string ClockAbbreviation { get; }
 
-        timeUnitType Hours { get; }
-        timeUnitType Minutes { get; }
-        timeUnitType Seconds { get; }
-        timeUnitType Milliseconds { get; }
+        string ToShortString();
 
-        ITime<timeUnitType> PopulateFromUtc(int utcHours, int utcMinutes, int utcSeconds, int utcMilliseconds);
-        ITime<timeUnitType> PopulateFromUtc(TimeSpan utcTime);
-        
-        ITime<timeUnitType> SetToNow();
-        bool Equals(ITime<timeUnitType> dc1, ITime<timeUnitType> dc2);
+        ITime PopulateFromUtc(int utcHours, int utcMinutes, int utcSeconds, int utcMilliseconds);
+        ITime PopulateFromUtc(TimeSpan utcTime);
+
+        ITime SetToNow();
+
+        bool AreEqual(ITime t1, ITime t2);
     }
 }

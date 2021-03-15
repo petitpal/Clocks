@@ -1,95 +1,57 @@
 ﻿using Clocks.App.Button;
-using Clocks.App.Display;
+using Clocks.App.ClockRunner;
 using Clocks.App.Factories;
 using Clocks.Classes;
-using Iot.Device.CharacterLcd;
-using Iot.Device.Pcx857x;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using System;
-using System.Device.Gpio;
-using System.Device.I2c;
 
 namespace Clocks.App
 {
     class Program
     {
-        public static ClockRunner _clockRunner;
-
         static void Main(string[] args)
         {
             Console.WriteLine("Displaying current time. Press Ctrl+C to end.");
 
             bool runningOnPi = true;
 
-            IControllerFactory controllerFactory;
-            IDeviceFactory deviceFactory;
+            using var host = CreateHostBuilder(args, runningOnPi).Build();
+            using var serviceScope = host.Services.CreateScope();
 
-            if (runningOnPi)
-            {
-                controllerFactory = new PiControllerFactory();
-                deviceFactory = new PiDeviceFactory(controllerFactory);
-            }
-            else
-            {
-                deviceFactory = new ConsoleDeviceFactory();
-            }
+            var clockRunner = serviceScope.ServiceProvider.GetService<IClockController>();
+            clockRunner.Clock1 = new StandardTime();
+            clockRunner.Clock2 = new MetricTime();
 
-
-            IClockDisplay display = deviceFactory.GetDisplay();
-
-            var button1 = deviceFactory.GetButton();
-            ConfigureButton(button1, 18);
-
-            var button2 = deviceFactory.GetButton();
-            ConfigureButton(button2, 25);
-
-
-            _clockRunner = new ClockRunner(display);
-            _clockRunner.Clock1 = new StandardTime();
-            _clockRunner.Clock2 = new MetricTime();
-
-
-            _clockRunner.RunClock();
+            clockRunner.RunClock();
             //var clock = Task.Factory.StartNew(() => _clockRunner.RunClockAsync());
             //clock.Wait(Timeout.Infinite);
         }
 
-        public static IPhysicalButton ConfigureButton(IPhysicalButton button, int pin)
+        static IHostBuilder CreateHostBuilder(string[] args, bool runningOnPi)
         {
-            button.Initialize(pin);
-            button.Click += ButtonClick;
-            button.Held += ButtonHeld;
-            return button;
-        }
+            var host = Host.CreateDefaultBuilder(args);
 
-        public static void ButtonClick(object sender, ButtonHandlerEventArgs e)
-        {
-            switch (e.pin)
-            {
-                case 18:
-                    _clockRunner.Clock1 = NextClock(_clockRunner.Clock1);
-                    break;
-                case 25:
-                    _clockRunner.Clock2 = NextClock(_clockRunner.Clock2);
-                    break;
-                default:
-                    Console.WriteLine($"Unrecongised pin {e.pin}");
-                    break;
+            // default
+            host.ConfigureServices((_, services) =>
+                    services.AddSingleton<IControllerFactory, PiControllerFactory>()
+                            .AddTransient<IClockController, ClockController>()
+            );
+
+            // emulation
+            if (runningOnPi) {
+                host.ConfigureServices((_, services) =>
+                    services.AddSingleton<IDeviceFactory, PiDeviceFactory>()
+                );
             }
-            Console.WriteLine($"Button pressed on pin {e.pin}");
-        }
-
-        public static void ButtonHeld(object sender, ButtonHandlerEventArgs e)
-        {
-            Console.WriteLine($"Button held on pin {e.pin}");
-        }
-
-        public static ITime NextClock(ITime currentClock)
-        {
-            switch (currentClock)
+            else
             {
-                case StandardTime t1: return new MetricTime();
-                default: return new StandardTime();
+                host.ConfigureServices((_, services) =>
+                    services.AddSingleton<IDeviceFactory, ConsoleDeviceFactory>()
+                );
             }
+
+            return host;
         }
 
     }

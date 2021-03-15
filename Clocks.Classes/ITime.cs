@@ -8,10 +8,10 @@ namespace Clocks.Classes
 
         string ToShortString();
 
-        ITime PopulateFromUtc(int utcHours, int utcMinutes, int utcSeconds, int utcMilliseconds);
-        ITime PopulateFromUtc(TimeSpan utcTime);
+        void PopulateFromUtc(int utcHours, int utcMinutes, int utcSeconds, int utcMilliseconds);
+        void PopulateFromUtc(TimeSpan utcTime);
 
-        ITime SetToNow();
+        void SetToNow();
 
         bool AreEqual(ITime t1, ITime t2);
     }

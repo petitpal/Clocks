@@ -20,7 +20,8 @@ namespace ClocksTest
             // arrange
 
             // act
-            var mt = (MetricTime)new MetricTime().PopulateFromUtc(utcHours, utcMinutes, utcSeconds, utcMs);
+            var mt = new MetricTime();
+            mt.PopulateFromUtc(utcHours, utcMinutes, utcSeconds, utcMs);
             
             // assert
             Assert.AreEqual(mt.Hours, decHours);

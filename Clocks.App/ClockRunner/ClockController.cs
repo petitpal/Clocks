@@ -46,7 +46,7 @@ namespace Clocks.App.ClockRunner
                     DisplayClock(1, Clock2);
                 }
 
-                Thread.Sleep(500);
+                Thread.Sleep(100);
             }
         }
 
@@ -54,7 +54,7 @@ namespace Clocks.App.ClockRunner
         {
             if (time == null) return;
             _display.SetCursorPosition(0, line);
-            _display.Write($"{time.ClockAbbreviation}: {time.ToShortString()}");
+            _display.Write($"{time.ClockAbbreviation} {time.ToShortString()}");
         }
 
         public IPhysicalButton ConfigureButton(IPhysicalButton button, int pin)
@@ -92,6 +92,7 @@ namespace Clocks.App.ClockRunner
             switch (currentClock)
             {
                 case StandardTime t1: return new MetricTime();
+                case MetricTime t2: return new BinaryTime(14);
                 default: return new StandardTime();
             }
         }

@@ -2,7 +2,7 @@
 
 namespace Clocks.App.Button
 {
-    public abstract class PhysicalButtonBase : IButtonHandler
+    public abstract class PhysicalButtonBase : IPhysicalButton
     {
         public event EventHandler<ButtonHandlerEventArgs> Click;
         public event EventHandler<ButtonHandlerEventArgs> DoubleClick;

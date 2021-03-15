@@ -1,13 +1,12 @@
 ﻿using Clocks.App.Button;
 using Clocks.App.Display;
+using Clocks.App.Factories;
 using Clocks.Classes;
 using Iot.Device.CharacterLcd;
 using Iot.Device.Pcx857x;
 using System;
 using System.Device.Gpio;
 using System.Device.I2c;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Clocks.App
 {
@@ -19,46 +18,29 @@ namespace Clocks.App
         {
             Console.WriteLine("Displaying current time. Press Ctrl+C to end.");
 
-            using I2cDevice i2c = I2cDevice.Create(new I2cConnectionSettings(1, 0x27));
-            using var driver = new Pcf8574(i2c);
-            using var gpc = new GpioController(PinNumberingScheme.Logical, driver);
-            using var lcd = new Lcd2004(registerSelectPin: 0,
-                               enablePin: 2,
-                               dataPins: new int[] { 4, 5, 6, 7 },
-                               backlightPin: 3,
-                               backlightBrightness: 1.0f,
-                               readWritePin: 1,
-                               controller: gpc);
-
-            using var buttonGpc = new GpioController(PinNumberingScheme.Logical);
-
-
             bool runningOnPi = true;
-            IClockDisplay display = default;
-            IButtonHandler button1 = default;
-            IButtonHandler button2 = default;
+
+            IControllerFactory controllerFactory;
+            IDeviceFactory deviceFactory;
 
             if (runningOnPi)
             {
-                display = new LcdClockDisplay(lcd);
-                button1 = new PiPhysicalButton(buttonGpc);
-                button2 = new PiPhysicalButton(buttonGpc);
+                controllerFactory = new PiControllerFactory();
+                deviceFactory = new PiDeviceFactory(controllerFactory);
             }
             else
             {
-                display = new ConsoleClockDIsplay();
-                button1 = new ConsolePhysicalButton();
-                button2 = new ConsolePhysicalButton();
+                deviceFactory = new ConsoleDeviceFactory();
             }
 
-            button1.Initialize(18);
-            button2.Initialize(25);
-            
-            button1.Click += ButtonClick;
-            button2.Click += ButtonClick;
 
-            button1.Held += ButtonHeld;
-            button2.Held += ButtonHeld;
+            IClockDisplay display = deviceFactory.GetDisplay();
+
+            var button1 = deviceFactory.GetButton();
+            ConfigureButton(button1, 18);
+
+            var button2 = deviceFactory.GetButton();
+            ConfigureButton(button2, 25);
 
 
             _clockRunner = new ClockRunner(display);
@@ -66,10 +48,17 @@ namespace Clocks.App
             _clockRunner.Clock2 = new MetricTime();
 
 
-            _clockRunner.RunClockAsync();
+            _clockRunner.RunClock();
             //var clock = Task.Factory.StartNew(() => _clockRunner.RunClockAsync());
             //clock.Wait(Timeout.Infinite);
+        }
 
+        public static IPhysicalButton ConfigureButton(IPhysicalButton button, int pin)
+        {
+            button.Initialize(pin);
+            button.Click += ButtonClick;
+            button.Held += ButtonHeld;
+            return button;
         }
 
         public static void ButtonClick(object sender, ButtonHandlerEventArgs e)

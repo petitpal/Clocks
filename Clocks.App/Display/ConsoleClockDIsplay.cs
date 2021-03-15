@@ -2,7 +2,7 @@
 
 namespace Clocks.App.Display
 {
-    public class ConsoleClockDIsplay : IClockDisplay
+    public class ConsoleClockDisplay : IClockDisplay
     {
         public void Clear() =>
             Console.Clear();

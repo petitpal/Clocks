@@ -17,7 +17,7 @@ namespace Clocks.App
         public ITime Clock1 { get; set; }
         public ITime Clock2 { get; set; }
 
-        public void RunClockAsync()
+        public void RunClock()
         {
             _display.Clear();
             //_display.SetCursorPosition(3, 0);

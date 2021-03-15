@@ -3,7 +3,7 @@ using System.Device.Gpio;
 
 namespace Clocks.App.Button
 {
-    public interface IButtonHandler
+    public interface IPhysicalButton
     {
         event EventHandler<ButtonHandlerEventArgs> Click;
         event EventHandler<ButtonHandlerEventArgs> DoubleClick;

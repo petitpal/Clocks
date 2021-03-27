@@ -1,6 +1,6 @@
 # Clocks
 Clocks
 
+A little application to run a few different types of clock on a raspberry pi. Requires a 2x16 LCD, and two push buttons
 
-dotnet build Clocks.App
-dotnet publish Clocks.App -r linux-arm -o \\raspberrypi\share\publish
+Just a home project, for fun!
